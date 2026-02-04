@@ -2,6 +2,8 @@
 
 SG_ID="sg-028ddb0e8c0c3c494" # replace with your ID
 AMI_ID="ami-0220d79f3f480ecf5"
+ZONE_ID="Z05013202FKF0ZL12WAOP"
+DOMAIN_NAME="daws88s.online"
 
 for instance in $@
 do
@@ -32,3 +34,30 @@ do
     fi
 
     echo "IP Address: $IP"
+
+    aws route53 change-resource-record-sets \
+    --hosted-zone-id $ZONE_ID \
+    --change-batch '
+    {
+        "Comment": "Updating record",
+        "Changes": [
+            {
+            "Action": "UPSERT",
+            "ResourceRecordSet": {
+                "Name": "'$RECORD_NAME'",
+                "Type": "A",
+                "TTL": 1,
+                "ResourceRecords": [
+                {
+                    "Value": "'$IP'"
+                }
+                ]
+            }
+            }
+        ]
+    }
+    '
+
+    echo "record updated for $instance"
+
+done
