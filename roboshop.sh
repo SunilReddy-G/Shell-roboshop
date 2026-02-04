@@ -3,7 +3,7 @@ SG_ID="sg-028ddb0e8c0c3c494" #replace with your ID
 AMI_ID="ami-0220d79f3f480ecf5" # replace with which operating system required
 for instance in $@
 do
-    instance_id = $( aws ec2 run-instances \
+    INSTANCE_ID=$( aws ec2 run-instances \
     --image-id $AMI_ID \
     --instance-type "t3.micro" \
     --security-group-ids $SG_ID \
@@ -14,13 +14,16 @@ do
     if [$instance == "frontend" ]; then
         IP=$(
         aws ec2 describe-instances \
-        --instance-ids $instance_id \
+        --instance-ids $INSTANCE_ID \
         --query 'Reservations[]. Instance[]. PublichIpAddress' \
         --output text)
     else
         IP=$(
         aws ec2 describe-instances \
-        --instance-ids $instance_id \
+        --instance-ids $INSTANCE_ID \
         --query 'Reservations[]. Instance[]. PublichIpAddress' \
-        --output text)  
+        --output text)
+    fi
+
+    echo "IP Adress: $IP"
 done
